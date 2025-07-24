@@ -2,29 +2,29 @@ name: Deploy to InfinityFree
 on:
 push:
     branches:
-    - main
+      - main
 jobs:
 ftp-deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-        uses: actions/checkout@v3
+      uses: actions/checkout@v3
 
     - name: Set up PHP with composer
-        uses: shivammathur/setup-php@v2
-        with:
+      uses: shivammathur/setup-php@v2
+      with:
         php-version: '8.4'
         extensions: mbstring, intl
         tools: composer
 
 
     - name: Install dependencies with composer
-        working-directory: ./src
-        run: composer install --no-dev --optimize-autoloader
+      working-directory: ./src
+      run: composer install --no-dev --optimize-autoloader
 
     - name: upload public files to htdocs/
-        uses: SamKirkland/FTP-Deploy-Action@4.1.0
-        with:
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
+      with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
@@ -33,15 +33,15 @@ ftp-deploy:
         state-name: ftpdeploy-public
 
     - name: Prepare src without public
-        run: |
+      run: |
         mkdir temp_src
         shopt -s extglob
         cp -r src/!(public) temp_src/
-        shell: bash
+      shell: bash
 
     - name: upload src (except public) to htdocs/src/
-        uses: SamKirkland/FTP-Deploy-Action@4.1.0
-        with:
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
+      with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
@@ -50,7 +50,7 @@ ftp-deploy:
         state-name: ftpdeploy-src
 
     - name: Create .env file in temp folder
-        run: |
+      run: |
         mkdir temp_env
         echo "APP_NAME=Laravel" > temp_env/.env
         echo "APP_ENV=production" >> temp_env/.env
@@ -82,10 +82,11 @@ ftp-deploy:
         echo "MAIL_ENCRYPTION=null" >> temp_env/.env
         echo "MAIL_FROM_ADDRESS=null" >> temp_env/.env
         echo "MAIL_FROM_NAME=\"\${APP_NAME}\"" >> temp_env/.env
+      shell: bash
 
     - name: Upload .env file to remote root
-        uses: SamKirkland/FTP-Deploy-Action@4.1.0
-        with:
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
+      with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
