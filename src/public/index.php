@@ -2,6 +2,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
+/** Comment for depoly */
+
 define('LARAVEL_START', microtime(true));
 
 // Detectar entorno local o producción según existencia de carpeta o archivo
